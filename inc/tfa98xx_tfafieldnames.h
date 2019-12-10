@@ -1,11 +1,13 @@
-/*
- * Copyright (C) 2014 NXP Semiconductors, All Rights Reserved.
+/* 
+ * Copyright (C) 2014-2020 NXP Semiconductors, All Rights Reserved.
+ * Copyright 2020 GOODIX 
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  *
  */
+
 
 typedef struct TfaBfName {
    unsigned short bfEnum;
@@ -26,6 +28,8 @@ typedef struct TfaIrqName {
 #include "tfa9872_tfafieldnames.h"
 #include "tfa9912_tfafieldnames.h"
 #include "tfa9896_tfafieldnames.h"
+#include "tfa9873_tfafieldnames.h"
+#include "tfa9873_tfafieldnames_B0.h"
 #include "tfa9874_tfafieldnames.h"
 #include "tfa9878_tfafieldnames.h"
 #include "tfa9894_tfafieldnames.h"
@@ -53,6 +57,9 @@ typedef struct TfaIrqName {
 #define TFA1_BF_R25CR	 -1
 #define TFA1_BF_SWPROFIL 0x8045    /*!< profile save   */
 #define TFA1_BF_SWVSTEP  0x80a5    /*!< vstep save  */
+
+#define TFA1_BF_TDMNBCK     -1
+#define TFA1_BF_TDMSSIZE     -1
 
 /* missing 'common' defs break the build */
 #define TFA2_BF_CFSM -1

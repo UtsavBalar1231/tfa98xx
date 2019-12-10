@@ -1,11 +1,13 @@
-/*
- * Copyright (C) 2014 NXP Semiconductors, All Rights Reserved.
+/* 
+ * Copyright (C) 2014-2020 NXP Semiconductors, All Rights Reserved.
+ * Copyright 2020 GOODIX 
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  *
  */
+
 
 /**\file
  *
@@ -130,8 +132,8 @@ struct tfa_device {
 	int tfadsp_event; /**< enum tfadsp_event_en is for external registry */
 	int verbose; /**< verbosity level for debug print output */
 	enum tfa_state state;  /**< last known state or-ed with optional state_modifier */
-	struct nxpTfaContainer *cnt;/**< the loaded container file */
-	struct nxpTfaVolumeStepRegisterInfo *p_regInfo; /**< remember vstep for partial updates */
+	struct TfaContainer *cnt;/**< the loaded container file */
+	struct TfaVolumeStepRegisterInfo *p_regInfo; /**< remember vstep for partial updates */
 	int partial_enable; /**< enable partial updates */
 	void *data; /**< typically pointing to Linux driver structure owning this device */
 	int convert_dsp32; /**< convert 24 bit DSP messages to 32 bit */
@@ -180,8 +182,13 @@ int tfa_dev_probe(int slave, struct tfa_device *tfa);
  *  @param vstep the selected vstep to use
  *  @return tfa_error enum
  */
-enum tfa_error tfa_dev_start(struct tfa_device *tfa, int profile, int vstep);
-
+/*[nxp34663] CR: support 16bit/24bit/32bit audio data. begin*/
+#ifdef __KERNEL__
+enum tfa_error tfa_dev_start(struct tfa_device *tfa, int next_profile, int vstep, u8 pcm_format);
+#else
+enum tfa_error tfa_dev_start(struct tfa_device *tfa, int next_profile, int vstep);
+#endif
+/*[nxp34663] CR: support 16bit/24bit/32bit audio data. end*/
 
 /**
  * Stop audio for this instance as gracefully as possible.
@@ -229,7 +236,6 @@ enum tfa_error tfa_dev_set_state(struct tfa_device *tfa, enum tfa_state state,in
  *
  */
 enum tfa_state tfa_dev_get_state(struct tfa_device *tfa);
-
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -288,4 +294,3 @@ int tfa_irq_unmask(struct tfa_device *tfa);
 //debug?
 
 #endif /* __TFA_DEVICE_H__ */
-
