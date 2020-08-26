@@ -88,11 +88,6 @@ static int no_reset = 0;
 module_param(no_reset, int, S_IRUGO);
 MODULE_PARM_DESC(no_reset, "do not use the reset line; for debugging via user\n");
 
-static int pcm_sample_format = 0; /*Be carefull:  setting pcm_sample_format to 3 means TDM settings will be dynamically adapted, please do not set the
-HW TDM Setting in the container file in case of dynamic sample format seletcion*/
-module_param(pcm_sample_format, int, S_IRUGO);
-MODULE_PARM_DESC(pcm_sample_format, "PCM sample format: 0=S16_LE, 1=S24_LE, 2=S32_LE, 3=dynamic\n");
-
 static int pcm_no_constraint = 0;
 module_param(pcm_no_constraint, int, S_IRUGO);
 MODULE_PARM_DESC(pcm_no_constraint, "do not use constraints for PCM parameters\n");
@@ -2418,8 +2413,6 @@ static int tfa98xx_startup(struct snd_pcm_substream *substream,
 	unsigned int sr;
 	int len, prof, nprof, idx = 0;
 	char *basename;
-	u64 formats;
-	int err;
 
 	/*
 	 * Support CODEC to CODEC links,
@@ -2430,26 +2423,6 @@ static int tfa98xx_startup(struct snd_pcm_substream *substream,
 
 	if (pcm_no_constraint != 0)
 		return 0;
-
-	switch (pcm_sample_format) {
-    case 0:
-    	formats = SNDRV_PCM_FMTBIT_S16_LE;
-        break;
-	case 1:
-		formats = SNDRV_PCM_FMTBIT_S24_LE;
-		break;
-	case 2:
-		formats = SNDRV_PCM_FMTBIT_S32_LE;
-		break;
-	default:
-		formats = TFA98XX_FORMATS;
-		break;
-	}
-
-	err = snd_pcm_hw_constraint_mask64(substream->runtime,
-		SNDRV_PCM_HW_PARAM_FORMAT, formats);
-	if (err < 0)
-		return err;
 
 	if (no_start != 0)
 		return 0;
@@ -2577,19 +2550,12 @@ static int tfa98xx_hw_params(struct snd_pcm_substream *substream,
 
 	/* Supported */
 	rate = params_rate(params);
-    tfa98xx->tfa->bitwidth = params_width(params);
-    tfa98xx->tfa->dynamicTDMmode = pcm_sample_format;
 	pr_debug("Requested rate: %d, sample size: %d, physical size: %d\n",
 		rate, snd_pcm_format_width(params_format(params)),
 		snd_pcm_format_physical_width(params_format(params)));
 
 	if (no_start != 0)
 		return 0;
-	/* set TDM bit width */
-	pr_debug("%s: Requested width: %d\n", __func__,
-			params_width(params));
-	if ((tfa98xx->tfa->dynamicTDMmode == 3) && tfa_dev_set_tdm_bitwidth(tfa98xx->tfa,tfa98xx->tfa->bitwidth))
-		return -EINVAL;
 	/* check if samplerate is supported for this mixer profile */
 	prof_idx = get_profile_id_for_sr(tfa98xx_mixer_profile, rate);
 	if (prof_idx < 0) {
