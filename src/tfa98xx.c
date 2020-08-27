@@ -2960,14 +2960,11 @@ static int tfa98xx_mute(struct snd_soc_dai *dai, int mute, int stream)
 			tfa98xx->cstream = 1;
 		}
 
-#if 0
-		/* Start DSP with async mode.*/
-		if (tfa98xx->dsp_init != TFA98XX_DSP_INIT_PENDING)
-			queue_delayed_work(tfa98xx->tfa98xx_wq,
-				&tfa98xx->init_work, 0);
-#else
-		tfa98xx_dsp_init(tfa98xx);
-#endif
+	/* Start DSP with async mode.*/
+	if (tfa98xx->dsp_init != TFA98XX_DSP_INIT_PENDING)
+		queue_delayed_work(tfa98xx->tfa98xx_wq,
+			&tfa98xx->init_work, 0);
+
 	if (tfa98xx->flags & TFA98XX_FLAG_ADAPT_NOISE_MODE)
 			queue_delayed_work(tfa98xx->tfa98xx_wq,
 						&tfa98xx->nmodeupdate_work,
